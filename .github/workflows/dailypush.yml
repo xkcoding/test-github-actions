@@ -1,11 +1,11 @@
-name: 每日提交测试
+name: 每日自动提交测试
 
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "10 1 * * *" # cron表达式，Actions时区是UTC时间，所以上午9点要往前推8个小时
   watch:
     types: [ started ]
 

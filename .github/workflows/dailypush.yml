@@ -21,11 +21,11 @@ jobs:
           echo "`date +"%Y-%m-%d %H:%M:%S"` 编译运行"
       - name: 测试爬取
         run: |
-          echo "`date +"%Y-%m-%d %H:%M:%S"` 爬取图片" > run.log
+          touch run.log && echo "`date +"%Y-%m-%d %H:%M:%S"` 爬取图片" | cat - run.log > temp && mv temp run.log
       - name: 更新代码
         run: |
-          git config --global user.email auto-bot@xkcoding.com
-          git config --global user.name auto-bot
+          git config --global user.email 237497819@qq.com
+          git config --global user.name Yangkai.Shen
           git add .
           git commit -m "更新图片数据" -a
       - name: 提交变更

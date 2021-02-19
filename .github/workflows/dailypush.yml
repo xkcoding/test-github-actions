@@ -1,0 +1,34 @@
+name: 每日提交测试
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - "0 0 * * *"
+  watch:
+    types: [ started ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id  # 自己点的 start
+    steps:
+      - name: 获取代码
+        uses: actions/checkout@master
+      - name: 编译运行
+        run: |
+          echo "`date +"%Y-%m-%d %H:%M:%S"` 编译运行"
+      - name: 测试爬取
+        run: |
+          echo "`date +"%Y-%m-%d %H:%M:%S"` 爬取图片" > run.log
+      - name: 更新代码
+        run: |
+          git config --global user.email auto-bot@xkcoding.com
+          git config --global user.name auto-bot
+          git add .
+          git commit -m "更新图片数据" -a
+      - name: 提交变更
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.BOT_TOKEN }}

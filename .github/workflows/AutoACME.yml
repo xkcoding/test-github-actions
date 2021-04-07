@@ -25,7 +25,7 @@ jobs:
       run: |
         mkdir -p ./ssl
         $ACME --issue --dns dns_ali -d xkcoding.com -d *.xkcoding.com
-        $ACME --installcert -d xkcoding.com --key-file ./ssl/xkcoding.com.key --fullchain-file ./ssl/xkcoding.com.cer
+        $ACME --installcert -d xkcoding.com -d *.xkcoding.com --ca-file ./ssl/ca.cer --cert-file ./ssl/xkcoding.com.cer --key-file ./ssl/xkcoding.com.key --fullchain-file ./ssl/fullchain.cer
         zip -r ssl.zip ssl
     - name: Send mail
       uses: dawidd6/action-send-mail@v2

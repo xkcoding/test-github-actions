@@ -8,7 +8,8 @@ on:
 
 env:
     ACME: /home/runner/.acme.sh/acme.sh
-    DNSAPI: ${{ secrets.DOMAIN_DNS }}
+    DOMAIN_DNS: ${{ secrets.DOMAIN_DNS }}
+    DOMAIN: xkcoding.com
 
 jobs:
   build:
@@ -20,12 +21,12 @@ jobs:
     - name: Install & Configure ACME.SH
       run: |
         curl  https://get.acme.sh | sh
-        echo "$DNSAPI" >> /home/runner/.acme.sh/account.conf
+        echo "$DOMAIN_DNS" >> /home/runner/.acme.sh/account.conf
     - name: Issue & Deploy Certificates
       run: |
         mkdir -p ./ssl
-        $ACME --issue --dns dns_ali -d xkcoding.com -d *.xkcoding.com
-        $ACME --installcert -d xkcoding.com -d *.xkcoding.com --ca-file ./ssl/ca.cer --cert-file ./ssl/xkcoding.com.cer --key-file ./ssl/xkcoding.com.key --fullchain-file ./ssl/fullchain.cer
+        $ACME --issue --dns dns_ali -d $DOMAIN -d *.$DOMAIN
+        $ACME --installcert -d $DOMAIN -d *.$DOMAIN --ca-file ./ssl/ca.cer --cert-file ./ssl/$DOMAIN.cer --key-file ./ssl/$DOMAIN.key --fullchain-file ./ssl/fullchain.cer
         zip -r ssl.zip ssl
     - name: Send mail
       uses: dawidd6/action-send-mail@v2
@@ -34,8 +35,8 @@ jobs:
         server_port: 465
         username: ${{ secrets.EMAIL_USER }}
         password: ${{ secrets.EMAIL_PASS }}
-        subject: GitHub Actions Auto ACME
-        body: Build job of ${{github.repository}} completed successfully!
+        subject: "[Actions]自动签发证书"
+        body: $DOMAIN 证书签发成功!
         to: 237497819@qq.com
-        from: GitHub Actions Auto ACME
+        from: "[Actions]系统通知"
         attachments: ./ssl.zip

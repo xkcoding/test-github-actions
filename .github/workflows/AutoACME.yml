@@ -36,7 +36,7 @@ jobs:
         username: ${{ secrets.EMAIL_USER }}
         password: ${{ secrets.EMAIL_PASS }}
         subject: "[Actions]自动签发证书"
-        body: "$DOMAIN 证书签发成功!"
+        body: "${{DOMAIN}} 证书签发成功!"
         to: 237497819@qq.com
         from: "[Actions]系统通知"
         attachments: ./ssl.zip

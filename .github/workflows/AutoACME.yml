@@ -1,0 +1,41 @@
+name: Auto ACME
+
+on:
+  schedule:
+    - cron: "0 2 1 * *"
+  watch:
+    types: [started]
+
+env:
+    ACME: /home/runner/.acme.sh/acme.sh
+    DNSAPI: ${{ secrets.DOMAIN_DNS }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install & Configure ACME.SH
+      run: |
+        curl  https://get.acme.sh | sh
+        echo "$DNSAPI" >> /home/runner/.acme.sh/account.conf
+    - name: Issue & Deploy Certificates
+      run: |
+        mkdir -p ./ssl
+        $ACME --issue --dns dns_ali -d xkcoding.com -d *.xkcoding.com
+        $ACME --installcert -d xkcoding.com --key-file ./ssl/xkcoding.com.key --fullchain-file ./ssl/xkcoding.com.cer
+        zip -r ssl.zip ssl
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v2
+      with:
+        server_address: smtp.qiye.aliyun.com
+        server_port: 465
+        username: ${{ secrets.EMAIL_USER }}
+        password: ${{ secrets.EMAIL_PASS }}
+        subject: GitHub Actions Auto ACME
+        body: Build job of ${{github.repository}} completed successfully!
+        to: 237497819@qq.com
+        from: GitHub Actions Auto ACME
+        attachments: ./ssl.zip

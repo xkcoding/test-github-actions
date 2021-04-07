@@ -27,8 +27,8 @@ jobs:
     - name: Issue & Deploy Certificates
       run: |
         mkdir -p ./ssl
-        $ACME --issue --dns dns_ali -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}}
-        $ACME --installcert -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}} --ca-file ./ssl/ca.cer --cert-file ./ssl/${{env.DOMAIN}}.cer --key-file ./ssl/${{env.DOMAIN}}.key --fullchain-file ./ssl/fullchain.cer
+        ${{env.ACME}} --issue --dns dns_ali -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}}
+        ${{env.ACME}} --installcert -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}} --ca-file ./ssl/ca.cer --cert-file ./ssl/${{env.DOMAIN}}.cer --key-file ./ssl/${{env.DOMAIN}}.key --fullchain-file ./ssl/fullchain.cer
         zip -r ssl.zip ssl
     - name: 邮件通知
       uses: dawidd6/action-send-mail@v2

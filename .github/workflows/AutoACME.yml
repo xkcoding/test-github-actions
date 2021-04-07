@@ -1,4 +1,4 @@
-name: Auto ACME
+name: 自动签发证书
 
 on:
   schedule:

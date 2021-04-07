@@ -1,8 +1,10 @@
 name: 自动签发证书
 
 on:
+  # 每月 1 号触发
   schedule:
     - cron: "0 2 1 * *"
+  # 首次通过点star触发
   watch:
     types: [started]
 
@@ -18,17 +20,17 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Install & Configure ACME.SH
+    - name: 配置 ACME
       run: |
         curl  https://get.acme.sh | sh
-        echo "$DOMAIN_DNS" >> /home/runner/.acme.sh/account.conf
+        echo "${{env.DOMAIN_DNS}}" >> /home/runner/.acme.sh/account.conf
     - name: Issue & Deploy Certificates
       run: |
         mkdir -p ./ssl
-        $ACME --issue --dns dns_ali -d $DOMAIN -d *.$DOMAIN
-        $ACME --installcert -d $DOMAIN -d *.$DOMAIN --ca-file ./ssl/ca.cer --cert-file ./ssl/$DOMAIN.cer --key-file ./ssl/$DOMAIN.key --fullchain-file ./ssl/fullchain.cer
+        $ACME --issue --dns dns_ali -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}}
+        $ACME --installcert -d ${{env.DOMAIN}} -d *.${{env.DOMAIN}} --ca-file ./ssl/ca.cer --cert-file ./ssl/${{env.DOMAIN}}.cer --key-file ./ssl/${{env.DOMAIN}}.key --fullchain-file ./ssl/fullchain.cer
         zip -r ssl.zip ssl
-    - name: Send mail
+    - name: 邮件通知
       uses: dawidd6/action-send-mail@v2
       with:
         server_address: smtp.qiye.aliyun.com
@@ -36,7 +38,7 @@ jobs:
         username: ${{ secrets.EMAIL_USER }}
         password: ${{ secrets.EMAIL_PASS }}
         subject: "[Actions]自动签发证书"
-        body: "${DOMAIN} 证书签发成功!"
+        body: "${{env.DOMAIN}} 证书签发成功!"
         to: 237497819@qq.com
         from: "[Actions]系统通知"
         attachments: ./ssl.zip
